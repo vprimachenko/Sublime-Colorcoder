@@ -2,6 +2,7 @@ Colorcoder
 ==========
 this plugin for Sublime Text will highlight every variable in its own, consistent color—feature known as semantic highlighting, variable-name highlighting, contextual highlighting—you name it.
 ![code from rosettacode.org used under GNU FDL 1.2](https://dl.dropboxusercontent.com/u/14672987/site/colorcoder/colorcoder.png)
+
 Notice how all instances of `m_nValue` share the same color
 
 Motivation
@@ -14,7 +15,7 @@ Installation
 ------------
 download the [zip-ball](https://github.com/vprimachenko/Sublime-Colorcoder/archive/master.zip) and unpack to `sublime\data\packages` or via [packageControl](https://sublime.wbond.net/)
 
-The plugin need a special language definition `.tmLanguage` file and a special highlighting `.tmTheme` file. It is bundled with appropriately modified `C++` language file (forked from [Isaac Muse](https://github.com/facelessuser)s [`better C++`](https://github.com/facelessuser/sublime-languages/blob/master/Better%20C++/C++.tmLanguage)
+The plugin need a special language definition `.tmLanguage` file and a special highlighting `.tmTheme` file. It is bundled with appropriately modified `C++` language file (forked from [Isaac Muse](https://github.com/facelessuser)s [`better C++`](https://github.com/facelessuser/sublime-languages/blob/master/Better%20C++/C++.tmLanguage)) and modified `Obisidian` color scheme
 
 Extension
 ----------
