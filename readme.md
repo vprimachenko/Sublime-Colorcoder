@@ -9,7 +9,9 @@ Motivation
 ----------
  - [“Coding in color”](https://medium.com/p/3a6db2743a1e/) by [Evan Brooks](https://medium.com/@evnbr)
  - actually thought about something to improve the current highlighting system and accent the data flow
- - help dysgraphic coder
+ - help dysgraphic/dyslexic coder
+
+it is important to note i use a `crc8` hash of the variable name to give similar named variables distinct colors to improve typo recognition
 
 Installation
 ------------
@@ -44,6 +46,6 @@ for other color schemes you need to specify `256` highlight rules ranging from `
 		</dict>
 	</dict>
 
-background here is 1 color unit less than the overall text background (here it was `#293134`
+background here is 1 color unit less than the overall text background (here it was `#293134`)
 
 Feel free to submit a push request if you add this to any language or color scheme.
