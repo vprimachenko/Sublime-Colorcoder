@@ -21,7 +21,7 @@ The plugin need a special language definition `.tmLanguage` file and a special h
 
 Extension
 ----------
-To make it work with other languages you only need to provide new lexical scope `variable.colorize` eg:
+To make it work with other languages you only need to provide new lexical scope `variable.colorcode` eg:
 
 	<dict>
 		<key>comment</key>
