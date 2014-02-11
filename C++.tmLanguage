@@ -76,14 +76,6 @@
 			<string>variable.other.readwrite.member.c++</string>
 		</dict>
 		<dict>
-			<key>comment</key>
-			<string>this is the important thing matching the varibles and stuff, these are the tokens we will colorize</string>
-			<key>match</key>
-			<string>\b\w+\b</string>
-			<key>name</key>
-			<string>variable.colorcode.c++</string>
-		</dict>
-		<dict>
 			<key>match</key>
 			<string>\b(this)\b</string>
 			<key>name</key>
@@ -202,6 +194,14 @@
 					<string>$base</string>
 				</dict>
 			</array>
+		</dict>
+		<dict>
+			<key>comment</key>
+			<string>this is the important thing matching the varibles and stuff, these are the tokens we will colorize</string>
+			<key>match</key>
+			<string>\b\w+\b</string>
+			<key>name</key>
+			<string>entity.name.variable.c++</string>
 		</dict>
 	</array>
 	<key>repository</key>

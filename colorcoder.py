@@ -52,7 +52,7 @@ class colorcoder(sublime_plugin.EventListener):
         for i in range(256):
             regs[hex(i)] = []
 
-        for r in view.find_by_selector('variable.colorcode'):
+        for r in view.find_by_selector('entity.name'):
             regs[hex(self.hasher.crc(view.substr(r)))].append(r)
 
         for key in regs:

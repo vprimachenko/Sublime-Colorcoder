@@ -21,7 +21,7 @@ The plugin need a special language definition `.tmLanguage` file and a special h
 
 Extension
 ----------
-To make it work with other languages you only need to provide new lexical scope `variable.colorcode` eg:
+it should work as is with most languages, to highlight even more tokens you need to add tokens with lexical scope `entity.name` eg:
 
 	<dict>
 		<key>comment</key>
@@ -29,7 +29,7 @@ To make it work with other languages you only need to provide new lexical scope 
 		<key>match</key>
 		<string>\b\w+\b</string>
 		<key>name</key>
-		<string>variable.colorcode.c++</string>
+		<string>entity.name.variable.c++</string>
 	</dict>
 
 for other color schemes you need to specify `256` highlight rules ranging from `cc0x0` to `cc0xff` eg:
