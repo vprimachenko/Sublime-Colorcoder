@@ -44,10 +44,13 @@ class colorcoder(sublime_plugin.EventListener):
 
     hasher = crc8();
 
-    def on_activated_async(self, view):
-        self.on_modified_async(view)
+    def on_activated(self, view):
+        self.on_modified(view)
 
-    def on_modified_async(self, view):
+    def on_modified(self, view):
+        sublime.set_timeout(lambda: self.on_modified_asynch(view), 0)
+
+    def on_modified_asynch(self, view):
         regs = {}
         for i in range(256):
             regs[hex(i)] = []
@@ -56,4 +59,4 @@ class colorcoder(sublime_plugin.EventListener):
             regs[hex(self.hasher.crc(view.substr(r)))].append(r)
 
         for key in regs:
-            view.add_regions('cc'+key,regs[key],'cc'+key,'', sublime.DRAW_NO_OUTLINE )
+            view.add_regions('cc'+key,regs[key],'cc'+key )
