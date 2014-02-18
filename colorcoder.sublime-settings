@@ -1,0 +1,7 @@
+{
+	"scopes": ["colorize",
+	           "entity.name",
+	           "support.function",
+	           "meta.function-call",
+	           "variable.other"]
+}

@@ -1,0 +1,21 @@
+[{	"caption": "Preferences",
+	"mnemonic": "n",
+	"id": "preferences",
+	"children":
+	[{	"caption": "Package Settings",
+		"mnemonic": "P",
+		"id": "package-settings",
+		"children":
+		[{	"id": "Colorcoder-set",
+			"caption": "Colorcoder",
+			"children":
+			[{	"caption": "Settings – Default",
+				"command": "open_file",
+				"args": {"file": "${packages}/Colorcoder/colorcoder.sublime-settings"},
+			},{	"caption": "Settings – User",
+				"command": "open_file",
+				"args": {"file": "${packages}/User/colorcoder.sublime-settings"},
+			}]
+		}]
+	}]
+}]
