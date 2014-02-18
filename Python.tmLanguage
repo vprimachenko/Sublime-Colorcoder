@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>fileTypes</key>
+	<array>
+		<string>py</string>
+	</array>
+	<key>firstLineMatch</key>
+	<string>^#!/.*\bpython[0-9.-]*\b</string>
+	<key>foldingStartMarker</key>
+	<string>^\s*(def|class)\s+([.a-zA-Z0-9_ &lt;]+)\s*(\((.*)\))?\s*:|\{\s*$|\(\s*$|\[\s*$|^\s*"""(?=.)(?!.*""")</string>
+	<key>foldingStopMarker</key>
+	<string>^\s*$|^\s*\}|^\s*\]|^\s*\)|^\s*"""\s*$</string>
+	<key>keyEquivalent</key>
+	<string>^~P</string>
+	<key>name</key>
+	<string>Python (Colorcode)</string>
+	<key>patterns</key>
+	<array>
+		<dict>
+			<key>match</key>
+			<string>\b((0(x|X)[0-9a-fA-F]*)|(([0-9]+\.?[0-9]*)|(\.[0-9]+))((e|E)(\+|-)?[0-9]+)?)(L|l|UL|ul|u|U|F|f|ll|LL|ull|ULL)?\b</string>
+			<key>name</key>
+			<string>constant.numeric.python</string>
+		</dict>
+		<dict>
+			<key>begin</key>
+			<string>"""</string>
+			<key>end</key>
+			<string>"""</string>
+			<key>name</key>
+			<string>string.python</string>
+		</dict>
+		<dict>
+			<key>begin</key>
+			<string>'''</string>
+			<key>end</key>
+			<string>'''</string>
+			<key>name</key>
+			<string>string.python</string>
+		</dict>
+		<dict>
+			<key>match</key>
+			<string>"(\\[rnt\\"]|[^"])*"</string>
+			<key>name</key>
+			<string>string.python</string>
+		</dict>
+		<dict>
+			<key>match</key>
+			<string>'[^']*'</string>
+			<key>name</key>
+			<string>string.python</string>
+		</dict>
+		<dict>
+			<key>match</key>
+			<string>(#).*$\n?</string>
+			<key>name</key>
+			<string>comment.python</string>
+		</dict>
+		<dict>
+			<key>match</key>
+			<string>\b(elif|else|except|finally|for|if|try|while|with|break|continue|pass|raise|return|yield|as|assert|del|exec|print|and|in|is|not|or|global|nonlocal|def|class|import|self|lambda)\b</string>
+			<key>name</key>
+			<string>keywords.python</string>
+		</dict>
+		<dict>
+			<key>match</key>
+			<string>\b\w+\b</string>
+			<key>name</key>
+			<string>colorize.python</string>
+		</dict>
+	</array>
+	<key>scopeName</key>
+	<string>source.python</string>
+</dict>
+</plist>
