@@ -1,0 +1,35 @@
+[{	"caption": "Tools",
+	"id": "tools",
+	"children":
+	[{	"caption": "Packages",
+		"id": "packages",
+		"children":
+		[{	"caption": "Colorcoder",
+			"id": "Colorcoder-com",
+			"children":
+			[{	"caption": "Add Colorcode to current color scheme",
+				"command": "colorshemeemodifier"
+			}]
+		}]
+	}]
+},{	"caption": "Preferences",
+	"mnemonic": "n",
+	"id": "preferences",
+	"children":
+	[{	"caption": "Package Settings",
+		"mnemonic": "P",
+		"id": "package-settings",
+		"children":
+		[{	"id": "Colorcoder-set",
+			"caption": "Colorcoder",
+			"children":
+			[{	"caption": "Settings – Default",
+				"command": "open_file",
+				"args": {"file": "${packages}/Colorcoder/colorcoder.sublime-settings"}
+			},{	"caption": "Settings – User",
+				"command": "open_file",
+				"args": {"file": "${packages}/User/colorcoder.sublime-settings"}
+			}]
+		}]
+	}]
+}]

@@ -17,11 +17,14 @@ Installation
 ------------
 download the [zip-ball](https://github.com/vprimachenko/Sublime-Colorcoder/archive/master.zip) and unpack to `sublime\data\packages` or via [packageControl](https://sublime.wbond.net/)
 
-The plugin need a special language definition `.tmLanguage` file and a special highlighting `.tmTheme` file. It is bundled with appropriately modified `C++` language file (forked from [Isaac Muse](https://github.com/facelessuser)s [`better C++`](https://github.com/facelessuser/sublime-languages/blob/master/Better%20C++/C++.tmLanguage)) and modified `Obisidian` color scheme
+On the first run plugin will cast magic to make everything work, but in the event you ever change your color scheme you should use `Tools`▶`Packages`▶`Colorcoder`▶` Add Colorcode to current color scheme`  (or <kbd>CTRL</kbd><kbd>SHIFT</kbd><kbd>P</kbd> it) to make everything nice again 
+(note: the plugin will not actually modify the scheme but create a modified copy in its own directory and apply it)
+
+As few language defintions provided by Sublime are insufficient for optimal Colorcoder results i bundle tailored defintions. You can set them up as default via `language menu`▶`Open all with current extension as`▶`*** (Colorcode)` or copy/hardlink `Packages/Colorcoder/***.tmLanguage` to `Packages/***/***.tmLanguage`
 
 Extension
 ----------
-it should work as is with most languages, to highlight even more tokens you need to add tokens with lexical scope `entity.name` eg:
+it should work as is with most languages, to highlight even more tokens you only need to add tokens with lexical scope `colorize` eg:
 
 	<dict>
 		<key>comment</key>
@@ -32,20 +35,4 @@ it should work as is with most languages, to highlight even more tokens you need
 		<string>entity.name.variable.c++</string>
 	</dict>
 
-for other color schemes you need to specify `256` highlight rules ranging from `cc0x0` to `cc0xff` eg:
-
-	<dict>
-		<key>scope</key>
-		<string>cc0xef</string>
-		<key>settings</key>
-		<dict>
-			<key>foreground</key>
-			<string>#cc668f</string>
-			<key>background</key>
-			<string>#293133</string>
-		</dict>
-	</dict>
-
-background here is 1 color unit less than the overall text background (here it was `#293134`)
-
-Feel free to submit a push request if you add this to any language or color scheme.
+(c.f. bundled `.tmLanguage` files, you probably would only need to replace the keywords)
