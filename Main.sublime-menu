@@ -1,4 +1,18 @@
-[{	"caption": "Preferences",
+[{	"caption": "Tools",
+	"id": "tools",
+	"children":
+	[{	"caption": "Packages",
+		"id": "packages",
+		"children":
+		[{	"caption": "Colorcoder",
+			"id": "Colorcoder-com",
+			"children":
+			[{	"caption": "Add Colorcode to current color scheme",
+				"command": "colorshemeemodifier"
+			}]
+		}]
+	}]
+},{	"caption": "Preferences",
 	"mnemonic": "n",
 	"id": "preferences",
 	"children":

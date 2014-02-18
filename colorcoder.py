@@ -1,4 +1,4 @@
-import sublime, sublime_plugin
+import sublime, sublime_plugin, colorsys, plistlib, re, os
 
 class crc8:
     def __init__(self):
@@ -52,6 +52,10 @@ class colorcoder(sublime_plugin.EventListener):
         sublime.set_timeout(self.read_settings,500)
 
     def read_settings(self):
+        firstrunfile = sublime.packages_path()+"/Colorcoder/firstrun"
+        if not os.path.exists(firstrunfile):
+            modify_color_scheme()
+            open(firstrunfile, 'a').close()
 
         self.scopes = sublime.load_settings("colorcoder.sublime-settings").get('scopes',['colorize','entity.name','support.function','meta.function-call','variable.other'])
         self.on_modified_async(sublime.active_window().active_view())
@@ -74,3 +78,48 @@ class colorcoder(sublime_plugin.EventListener):
     def on_text_command(self, win, cmd, args):
         if cmd=="set_file_type":
             self.on_modified_async(sublime.active_window().active_view())
+
+class colorshemeemodifier(sublime_plugin.ApplicationCommand):
+    def run(self):
+        sublime.active_window().show_input_panel("Lightness and Saturation","0.5 0.5",lambda text: modify_color_scheme(*map(str,text.split(' '))),None,None)
+
+def modify_color_scheme(l=0.5,s=0.5):
+    name = sublime.active_window().active_view().settings().get('color_scheme')
+    cs = plistlib.readPlistFromBytes(bytes(sublime.load_resource(name),'UTF-8'))
+
+    tokenclr = "#000000"
+
+    for rule in cs["settings"]:
+        if "scope" not in rule:
+            bgc = rule["settings"]["background"]
+            r = int(bgc[1:3],16)
+            g = int(bgc[3:5],16)
+            b = int(bgc[5:7],16)
+            if b>0:
+                b = b-1
+            elif g>0:
+                g = g-1
+            elif r>0:
+                r = r-1
+            else:
+                rule["settings"]["background"] = "#000001"
+
+            tokenclr =  "#%02x%02x%02x" % (r,g,b)
+
+    cs["name"] = cs["name"] + " (Colorcode)"
+
+    for x in range(0,256):
+        cs["settings"].append(dict(
+            scope="cc0x%x" % x,
+            settings=dict(
+                foreground="#"+''.join(map(lambda c: "%02x" % int(256*c),colorsys.hls_to_rgb(x/256, 0.5, 0.5))),
+                background=tokenclr
+            )
+        ))
+
+    newname = "/Colorcoder/%s (Colorcode).tmTheme" % re.search("/([^/]+).tmTheme$", name).group(1)
+
+    plistlib.writePlist(cs,"%s%s" % (sublime.packages_path(),newname))
+
+    sublime.load_settings("Preferences.sublime-settings").set("color_scheme","Packages%s" % newname)
+    sublime.save_settings("Preferences.sublime-settings")
