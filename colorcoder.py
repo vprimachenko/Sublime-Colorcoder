@@ -39,7 +39,11 @@ class crc8:
         runningCRC = 0
         for c in msg:
             c = ord(c)
-            runningCRC = self.crcTable[runningCRC ^ c]
+            try:
+                runningCRC = self.crcTable[runningCRC ^ c]
+            except IndexError:
+                print("Index Error in Colorcoder: runningCRC:%x^c:%x=%x" % (runningCRC,c,runningCRC^c))
+                sublime.active_window().run_command("show_panel", {"panel": "console", "toggle": True})
         return runningCRC
 
 class colorcoder(sublime_plugin.EventListener):
@@ -47,22 +51,30 @@ class colorcoder(sublime_plugin.EventListener):
     hasher = crc8();
     scopes = ['colorize','entity.name','support.function','variable']
 
+
     def __init__(self):
-        sublime.load_settings("colorcoder.sublime-settings").add_on_change('scopes',self.read_settings)
         sublime.set_timeout(self.read_settings,500)
 
     def read_settings(self):
+        sublime.load_settings("colorcoder.sublime-settings").add_on_change('scopes',self.read_settings)
+        sublime.load_settings("Preferences.sublime-settings").add_on_change('color_scheme',self.maybefixscheme)
         pp = sublime.packages_path()
         if not os.path.exists(pp+"/Colorcoder"):
             os.makedirs(pp+"/Colorcoder")
 
         firstrunfile = pp+"/Colorcoder/firstrun"
         if not os.path.exists(firstrunfile):
-            modify_color_scheme()
+            maybefixscheme()
             open(firstrunfile, 'a').close()
 
         self.scopes = sublime.load_settings("colorcoder.sublime-settings").get('scopes',['colorize','entity.name','support.function','meta.function-call','variable.other'])
         self.on_modified_async(sublime.active_window().active_view())
+
+    def maybefixscheme(self):
+        set = sublime.load_settings("colorcoder.sublime-settings")
+        if set.get('auto_apply_on_scheme_change'):
+            if sublime.load_settings("Preferences.sublime-settings").get('color_scheme').find('/Colorcoder/') == -1:
+                modify_color_scheme(set.get('lightness',0.5),set.get('saturation',0.5))
 
     def on_activated_async(self, view):
         self.on_modified_async(view)
@@ -79,16 +91,31 @@ class colorcoder(sublime_plugin.EventListener):
         for key in regs:
             view.add_regions('cc'+key,regs[key],'cc'+key,'', sublime.DRAW_NO_OUTLINE )
 
+
     def on_text_command(self, win, cmd, args):
         if cmd=="set_file_type":
             self.on_modified_async(sublime.active_window().active_view())
 
 class colorshemeemodifier(sublime_plugin.ApplicationCommand):
     def run(self):
-        sublime.active_window().show_input_panel("Lightness and Saturation","0.5 0.5",lambda text: modify_color_scheme(*map(str,text.split(' '))),None,None)
+        sublime.active_window().show_input_panel("Lightness and Saturation","0.5 0.5",self.panel_callback,None,None)
 
-def modify_color_scheme(l=0.5,s=0.5):
-    name = sublime.active_window().active_view().settings().get('color_scheme')
+    def panel_callback(self, text):
+        (l,s)= map(float,text.split(' '))
+        sublime.load_settings("colorcoder.sublime-settings").set('lightness',l)
+        sublime.load_settings("colorcoder.sublime-settings").set('saturation',s)
+        sublime.save_settings("colorcoder.sublime-settings")
+        modify_color_scheme(l,s,True)
+
+class colorcoderInspectScope(sublime_plugin.ApplicationCommand):
+    def run(self):
+        view = sublime.active_window().active_view();
+        sel = view.sel()[0]
+        print(view.scope_name(sel.a))
+        sublime.active_window().run_command("show_panel", {"panel": "console", "toggle": True})
+
+def modify_color_scheme(l,s,read_original = False):
+    name = sublime.load_settings("Preferences.sublime-settings").get("original_color_scheme") if read_original else sublime.active_window().active_view().settings().get('color_scheme')
     cs = plistlib.readPlistFromBytes(bytes(sublime.load_resource(name),'UTF-8'))
 
     tokenclr = "#000000"
@@ -116,7 +143,7 @@ def modify_color_scheme(l=0.5,s=0.5):
         cs["settings"].append(dict(
             scope="cc0x%x" % x,
             settings=dict(
-                foreground="#"+''.join(map(lambda c: "%02x" % int(256*c),colorsys.hls_to_rgb(x/256, 0.5, 0.5))),
+                foreground="#"+''.join(map(lambda c: "%02x" % int(256*c),colorsys.hls_to_rgb(x/256, l, s))),
                 background=tokenclr
             )
         ))
@@ -125,5 +152,6 @@ def modify_color_scheme(l=0.5,s=0.5):
 
     plistlib.writePlist(cs,"%s%s" % (sublime.packages_path(),newname))
 
+    sublime.load_settings("Preferences.sublime-settings").set("original_color_scheme", name)
     sublime.load_settings("Preferences.sublime-settings").set("color_scheme","Packages%s" % newname)
     sublime.save_settings("Preferences.sublime-settings")
