@@ -52,7 +52,11 @@ class colorcoder(sublime_plugin.EventListener):
         sublime.set_timeout(self.read_settings,500)
 
     def read_settings(self):
-        firstrunfile = sublime.packages_path()+"/Colorcoder/firstrun"
+        pp = sublime.packages_path()
+        if not os.path.exists(pp+"/Colorcoder"):
+            os.makedirs(pp+"/Colorcoder")
+
+        firstrunfile = pp+"/Colorcoder/firstrun"
         if not os.path.exists(firstrunfile):
             modify_color_scheme()
             open(firstrunfile, 'a').close()
