@@ -4,19 +4,7 @@
 <dict>
 	<key>fileTypes</key>
 	<array>
-		<string>cpp</string>
-		<string>cc</string>
-		<string>cp</string>
-		<string>cxx</string>
-		<string>c++</string>
-		<string>C</string>
-		<string>h</string>
-		<string>hh</string>
-		<string>hpp</string>
-		<string>hxx</string>
-		<string>h++</string>
-		<string>inl</string>
-		<string>ipp</string>
+		<string>go</string>
 	</array>
 	<key>firstLineMatch</key>
 	<string>-\*- C\+\+ -\*-</string>
@@ -27,41 +15,33 @@
 	</string>
 	<key>foldingStopMarker</key>
 	<string>(?&lt;!\*)\*\*/|^\s*\}</string>
-	<key>keyEquivalent</key>
-	<string>^~C</string>
 	<key>name</key>
-	<string>C++ (Colorcode)</string>
+	<string>Go (Colorcode)</string>
 	<key>patterns</key>
 	<array>
 		<dict>
 			<key>match</key>
-			<string>^\s*(#\s*(include(.*)$|\w+\b))</string>
-			<key>name</key>
-			<string>preprocessor.c++</string>
-		</dict>
-		<dict>
-			<key>match</key>
 			<string>\b((0(x|X)[0-9a-fA-F]*)|(([0-9]+\.?[0-9]*)|(\.[0-9]+))((e|E)(\+|-)?[0-9]+)?)(L|l|UL|ul|u|U|F|f|ll|LL|ull|ULL)?\b</string>
 			<key>name</key>
-			<string>constant.numeric.c++</string>
+			<string>constant.numeric.go</string>
 		</dict>
 		<dict>
 			<key>match</key>
 			<string>"(\\[rnt\\"]|[^"])*"</string>
 			<key>name</key>
-			<string>string.c++</string>
+			<string>string.go</string>
 		</dict>
 		<dict>
 			<key>match</key>
 			<string>'[^']*'</string>
 			<key>name</key>
-			<string>string.c++</string>
+			<string>string.go</string>
 		</dict>
 		<dict>
 			<key>match</key>
 			<string>//.*</string>
 			<key>name</key>
-			<string>comment.c++</string>
+			<string>comment.go</string>
 		</dict>
 		<dict>
 			<key>begin</key>
@@ -69,22 +49,22 @@
 			<key>end</key>
 			<string>\*/</string>
 			<key>name</key>
-			<string>comment.c++</string>
+			<string>comment.go</string>
 		</dict>
 		<dict>
 			<key>match</key>
-			<string>\b(namespace|using|const|for|do|while|if|else|elseif|case|switch|break|template|typename|static|struct|class|return|delete|new|throw|try|catch|inline|operator|\[[=]?\])\b</string>
+			<string>\b(package|import|for|if|go|defer|func|_)\b</string>
 			<key>name</key>
-			<string>keywords.c++</string>
+			<string>keywords.go</string>
 		</dict>
 		<dict>
 			<key>match</key>
-			<string>\b(unsigned )?\w+\b</string>
+			<string>\b\w+\b</string>
 			<key>name</key>
-			<string>colorize.c++</string>
+			<string>colorize.go</string>
 		</dict>
 	</array>
 	<key>scopeName</key>
-	<string>source.c++</string>
+	<string>source.go</string>
 </dict>
 </plist>
