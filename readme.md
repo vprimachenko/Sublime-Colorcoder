@@ -29,21 +29,21 @@ Sometimes things we are interested in don't have distinct scope e.g. the variabl
 - First you need to obtain it - it is inside the same names `.sublime-package` file, which is a zip-archive
 - now locate first instance of
 
-	<key>patterns</key>
-	<array>
+		<key>patterns</key>
+		<array>
 
 it should be somewhere within first 50 lines
 - use code folding to find where according `</array>` is
 - place following right before it
 
-	<dict>
-		<key>comment</key>
-		<string>this is the important thing matching the variables and stuff, these are the tokens we will colorize</string>
-		<key>match</key>
-		<string>\b\w+\b</string>
-		<key>name</key>
-		<string>colorize</string>
-	</dict>
+		<dict>
+			<key>comment</key>
+			<string>colorize everything</string>
+			<key>match</key>
+			<string>\b\w+\b</string>
+			<key>name</key>
+			<string>colorize</string>
+		</dict>
 
 or modify the bundled `.tmLanguage` files, you probably would only need to replace the keywords
 
