@@ -38,7 +38,7 @@ class crc8:
     def crc(self, msg):
         runningCRC = 0
         for c in msg:
-            c = ord(c)
+            c = ord(c) % 256
             runningCRC = self.crcTable[runningCRC ^ c]
         return runningCRC
 
