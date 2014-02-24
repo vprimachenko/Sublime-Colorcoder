@@ -60,7 +60,7 @@ class colorcoder(sublime_plugin.EventListener):
 
         firstrunfile = pp+"/Colorcoder/firstrun"
         if not os.path.exists(firstrunfile):
-            maybefixscheme()
+            self.maybefixscheme()
             open(firstrunfile, 'a').close()
 
         self.scopes = sublime.load_settings("colorcoder.sublime-settings").get('scopes',['colorize','entity.name','support.function','meta.function-call','variable.other'])
