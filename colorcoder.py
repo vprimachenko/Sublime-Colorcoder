@@ -76,6 +76,8 @@ class colorcoder(sublime_plugin.EventListener):
         sublime.set_timeout(lambda: self.on_modified_async(view), 0)
 
     def on_modified_async(self, view):
+        vcc = view.settings().get('color_scheme')
+        if vcc and "Widget" in vcc: return
         regs = {}
         for i in range(256):
             regs[hex(i)] = []
