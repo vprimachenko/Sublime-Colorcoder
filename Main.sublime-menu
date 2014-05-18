@@ -9,6 +9,9 @@
 			"children":
 			[{	"caption": "Tweak Colorcode on current color scheme",
 				"command": "colorshemeemodifier"
+			},{
+				"caption": "Dont Colorcode this view",
+				"command": "colorcoderdisabler"
 			}]
 		}]
 	}]

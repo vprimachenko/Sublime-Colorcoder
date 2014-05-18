@@ -13,6 +13,10 @@ Motivation
 
 it is important to note i use a `crc8` hash of the variable name to give similar named variables distinct colors to improve typo recognition
 
+Options
+-------
+Colorcoder allows you to specify white- and blacklist for file-types to highlight: the settings are `enabled_for` and `disabled_for`. If `enabled_for` is present in the config only those file-types will be highlighted, `disabled_for` wont be highlighted even if present in whitelist.
+
 Installation
 ------------
 download the [zip-ball](https://github.com/vprimachenko/Sublime-Colorcoder/archive/master.zip) and unpack to `sublime\data\packages` or via [packageControl](https://sublime.wbond.net/)

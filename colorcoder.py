@@ -1,4 +1,4 @@
-import sublime, sublime_plugin, colorsys, plistlib, re, os
+import sublime, sublime_plugin, colorsys, plistlib, re, os, os.path
 
 class crc8:
     def __init__(self):
@@ -60,6 +60,16 @@ class colorcoder(sublime_plugin.EventListener):
     working = False
 
     def on_load_async(self,view):
+        if view.file_name():
+            filename = os.path.split(view.file_name())[1]
+            dotp = filename.rfind('.')
+            ext = '' if dotp == -1 else filename[dotp+1:]
+            set = sublime.load_settings("colorcoder.sublime-settings")
+            if (set.has('enabled_for') and ext not in set.get('enabled_for')) or ext in set.get('disabled_for',[]):
+                view.settings().set('colorcode',False)
+                return
+        else:
+            pass
 
         vcc = view.settings().get('color_scheme')
         if vcc and "Widget" in vcc: 
