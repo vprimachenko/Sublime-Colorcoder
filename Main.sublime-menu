@@ -28,10 +28,10 @@
 			"children":
 			[{	"caption": "Settings – Default",
 				"command": "open_file",
-				"args": {"file": "${packages}/Colorcoder/colorcoder.sublime-settings"},
+				"args": {"file": "${packages}/Colorcoder/colorcoder.sublime-settings"}
 			},{	"caption": "Settings – User",
 				"command": "open_file",
-				"args": {"file": "${packages}/User/colorcoder.sublime-settings"},
+				"args": {"file": "${packages}/User/colorcoder.sublime-settings"}
 			}]
 		}]
 	}]

@@ -92,13 +92,10 @@ class colorcoder(sublime_plugin.EventListener):
         self.on_load_async(view)
 
     def on_modified_async(self, view):
-        tic = time.perf_counter()
-
         if not view.settings().get('colorcode',True):
             return
 
         regs = {}
-
         for i in map(hex,range(256)):
             regs[i] = []
 
