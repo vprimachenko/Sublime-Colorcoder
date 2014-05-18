@@ -33,6 +33,12 @@
 		</dict>
 		<dict>
 			<key>match</key>
+			<string>`[^']*`</string>
+			<key>name</key>
+			<string>string.go</string>
+		</dict>
+		<dict>
+			<key>match</key>
 			<string>'[^']*'</string>
 			<key>name</key>
 			<string>string.go</string>
@@ -53,7 +59,7 @@
 		</dict>
 		<dict>
 			<key>match</key>
-			<string>\b(package|import|for|if|go|defer|func|_)\b</string>
+			<string>\b(package|import|range|for|if|go|defer|func|var|_)\b</string>
 			<key>name</key>
 			<string>keywords.go</string>
 		</dict>

@@ -45,14 +45,11 @@ class crc8:
 class colorcoder(sublime_plugin.EventListener):
 
     hasher = crc8();
-    scopes = ['colorize','entity.name','support.function','variable']
-
 
     def __init__(self):
         sublime.set_timeout(self.read_settings,500)
 
     def read_settings(self):
-        sublime.load_settings("colorcoder.sublime-settings").add_on_change('scopes',self.read_settings)
         sublime.load_settings("Preferences.sublime-settings").add_on_change('color_scheme',self.maybefixscheme)
         pp = sublime.packages_path()
         if not os.path.exists(pp+"/Colorcoder"):
@@ -63,7 +60,6 @@ class colorcoder(sublime_plugin.EventListener):
             self.maybefixscheme()
             open(firstrunfile, 'a').close()
 
-        self.scopes = sublime.load_settings("colorcoder.sublime-settings").get('scopes',['colorize','entity.name','support.function','meta.function-call','variable.other'])
         self.on_modified(sublime.active_window().active_view())
 
     def maybefixscheme(self):
@@ -75,14 +71,35 @@ class colorcoder(sublime_plugin.EventListener):
     def on_modified(self, view):
         sublime.set_timeout(lambda: self.on_modified_async(view), 0)
 
-    def on_modified_async(self, view):
+    def on_load(self,view):
+        if view.file_name():
+            filename = os.path.split(view.file_name())[1]
+            dotp = filename.rfind('.')
+            ext = '' if dotp == -1 else filename[dotp+1:]
+            set = sublime.load_settings("colorcoder.sublime-settings")
+            if (set.has('enabled_for') and ext not in set.get('enabled_for')) or ext in set.get('disabled_for',[]):
+                view.settings().set('colorcode',False)
+                return
+        else:
+            pass
+
         vcc = view.settings().get('color_scheme')
-        if vcc and "Widget" in vcc: return
+        if vcc and "Widget" in vcc: 
+            view.settings().set('colorcode',False)
+            return
+
+        self.on_modified(view)
+
+
+    def on_modified_async(self, view):
+        if not view.settings().get('colorcode',True):
+            return
+
         regs = {}
         for i in range(256):
             regs[hex(i)] = []
 
-        for sel in self.scopes:
+        for sel in sublime.load_settings("colorcoder.sublime-settings").get('scopes'):
             for r in view.find_by_selector(sel):
                 regs[hex(self.hasher.crc(view.substr(r)))].append(r)
 
@@ -134,6 +151,7 @@ def modify_color_scheme(l,s,read_original = False):
                 rule["settings"]["background"] = "#000001"
 
             tokenclr =  "#%02x%02x%02x" % (r,g,b)
+            break
 
     cs["name"] = cs["name"] + " (Colorcode)"
 
@@ -153,3 +171,4 @@ def modify_color_scheme(l,s,read_original = False):
     sublime.load_settings("Preferences.sublime-settings").set("original_color_scheme", name)
     sublime.load_settings("Preferences.sublime-settings").set("color_scheme","Packages%s" % newname)
     sublime.save_settings("Preferences.sublime-settings")
+

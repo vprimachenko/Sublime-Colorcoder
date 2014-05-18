@@ -7,8 +7,11 @@
 		[{	"caption": "Colorcoder",
 			"id": "Colorcoder-com",
 			"children":
-			[{	"caption": "Add Colorcode to current color scheme",
+			[{	"caption": "Tweak Colorcode on current color scheme",
 				"command": "colorshemeemodifier"
+			},{
+				"caption": "Dont Colorcode this view",
+				"command": "colorcoderdisabler"
 			}]
 		}]
 	}]
