@@ -39,68 +39,77 @@ class crc8:
         runningCRC = 0
         for c in msg:
             c = ord(c) % 256
-            try:
-                runningCRC = self.crcTable[runningCRC ^ c]
-            except IndexError:
-                print("Index Error in Colorcoder: runningCRC:%x^c:%x=%x" % (runningCRC,c,runningCRC^c))
-                sublime.active_window().run_command("show_panel", {"panel": "console", "toggle": True})
+            runningCRC = self.crcTable[runningCRC ^ c]
         return runningCRC
+
+def plugin_loaded():
+    sublime.load_settings("Preferences.sublime-settings").add_on_change('color_scheme',maybefixscheme)
+    pp = sublime.packages_path()
+    if not os.path.exists(pp+"/Colorcoder"):
+        os.makedirs(pp+"/Colorcoder")
+
+    firstrunfile = pp+"/Colorcoder/firstrun"
+    if not os.path.exists(firstrunfile):
+        maybefixscheme()
+        open(firstrunfile, 'a').close()
 
 class colorcoder(sublime_plugin.EventListener):
 
     hasher = crc8();
-    scopes = ['colorize','entity.name','support.function','variable']
 
+    working = False
 
-    def __init__(self):
-        sublime.set_timeout(self.read_settings,500)
+    def on_load_async(self,view):
 
-    def read_settings(self):
-        sublime.load_settings("colorcoder.sublime-settings").add_on_change('scopes',self.read_settings)
-        sublime.load_settings("Preferences.sublime-settings").add_on_change('color_scheme',self.maybefixscheme)
-        pp = sublime.packages_path()
-        if not os.path.exists(pp+"/Colorcoder"):
-            os.makedirs(pp+"/Colorcoder")
-
-        firstrunfile = pp+"/Colorcoder/firstrun"
-        if not os.path.exists(firstrunfile):
-            self.maybefixscheme()
-            open(firstrunfile, 'a').close()
-
-        self.scopes = sublime.load_settings("colorcoder.sublime-settings").get('scopes',['colorize','entity.name','support.function','meta.function-call','variable.other'])
-        self.on_modified_async(sublime.active_window().active_view())
-
-    def maybefixscheme(self):
-        set = sublime.load_settings("colorcoder.sublime-settings")
-        if set.get('auto_apply_on_scheme_change'):
-            if sublime.load_settings("Preferences.sublime-settings").get('color_scheme').find('/Colorcoder/') == -1:
-                modify_color_scheme(set.get('lightness',0.5),set.get('saturation',0.5))
-
-    def on_activated_async(self, view):
-        self.on_modified_async(view)
-
-    def on_modified_async(self, view):
         vcc = view.settings().get('color_scheme')
-        if vcc and "Widget" in vcc: return
-        regs = {}
-        for i in range(256):
-            regs[hex(i)] = []
+        if vcc and "Widget" in vcc: 
+            view.settings().set('colorcode',False)
+            return
 
-        for sel in self.scopes:
+        regs = {}
+
+        for i in map(hex,range(256)):
+            regs[i] = []
+
+        for sel in sublime.load_settings("colorcoder.sublime-settings").get('scopes'):
             for r in view.find_by_selector(sel):
                 regs[hex(self.hasher.crc(view.substr(r)))].append(r)
 
         for key in regs:
             view.add_regions('cc'+key,regs[key],'cc'+key,'', sublime.DRAW_NO_OUTLINE )
 
+    def on_activated_async(self, view):
+        self.on_load_async(view)
 
-    def on_text_command(self, win, cmd, args):
+    def on_modified_async(self, view):
+        tic = time.perf_counter()
+
+        if not view.settings().get('colorcode',True):
+            return
+
+        regs = {}
+
+        for i in map(hex,range(256)):
+            regs[i] = []
+
+        for sel in sublime.load_settings("colorcoder.sublime-settings").get('scopes'):
+            for r in view.find_by_selector(sel):
+                regs[hex(self.hasher.crc(view.substr(r)))].append(r)
+
+        for key in regs:
+            view.add_regions('cc'+key,regs[key],'cc'+key,'', sublime.DRAW_NO_OUTLINE )
+
+    def post_text_command(self, win, cmd, args):
         if cmd=="set_file_type":
             self.on_modified_async(sublime.active_window().active_view())
 
+class colorcoderdisabler(sublime_plugin.ApplicationCommand):
+    def run(self):
+        sublime.active_window().active_view().settings().set('colorcode',False)
+
 class colorshemeemodifier(sublime_plugin.ApplicationCommand):
     def run(self):
-        sublime.active_window().show_input_panel("Lightness and Saturation","0.5 0.5",self.panel_callback,None,None)
+        sublime.active_window().show_input_panel("Lightness and Saturation","%s %s"%(sublime.load_settings("colorcoder.sublime-settings").get('lightness'),sublime.load_settings("colorcoder.sublime-settings").get('saturation')),self.panel_callback,None,None)
 
     def panel_callback(self, text):
         (l,s)= map(float,text.split(' '))
@@ -116,14 +125,19 @@ class colorcoderInspectScope(sublime_plugin.ApplicationCommand):
         print(view.scope_name(sel.a))
         sublime.active_window().run_command("show_panel", {"panel": "console", "toggle": True})
 
+def maybefixscheme():
+    set = sublime.load_settings("colorcoder.sublime-settings")
+    if set.get('auto_apply_on_scheme_change'):
+        if sublime.load_settings("Preferences.sublime-settings").get('color_scheme').find('/Colorcoder/') == -1:
+            modify_color_scheme(set.get('lightness'),set.get('saturation'))
+
 def modify_color_scheme(l,s,read_original = False):
     name = sublime.load_settings("Preferences.sublime-settings").get("original_color_scheme") if read_original else sublime.active_window().active_view().settings().get('color_scheme')
     cs = plistlib.readPlistFromBytes(bytes(sublime.load_resource(name),'UTF-8'))
-
     tokenclr = "#000000"
 
     for rule in cs["settings"]:
-        if "scope" not in rule:
+        if "scope" not in rule and "name" not in rule:
             bgc = rule["settings"]["background"]
             r = int(bgc[1:3],16)
             g = int(bgc[3:5],16)
@@ -136,8 +150,8 @@ def modify_color_scheme(l,s,read_original = False):
                 r = r-1
             else:
                 rule["settings"]["background"] = "#000001"
-
             tokenclr =  "#%02x%02x%02x" % (r,g,b)
+            break
 
     cs["name"] = cs["name"] + " (Colorcode)"
 
