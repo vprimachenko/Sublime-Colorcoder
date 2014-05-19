@@ -57,8 +57,6 @@ class colorcoder(sublime_plugin.EventListener):
 
     hasher = crc8();
 
-    working = False
-
     def on_load_async(self,view):
         if view.file_name():
             filename = os.path.split(view.file_name())[1]
@@ -76,17 +74,7 @@ class colorcoder(sublime_plugin.EventListener):
             view.settings().set('colorcode',False)
             return
 
-        regs = {}
-
-        for i in map(hex,range(256)):
-            regs[i] = []
-
-        for sel in sublime.load_settings("colorcoder.sublime-settings").get('scopes'):
-            for r in view.find_by_selector(sel):
-                regs[hex(self.hasher.crc(view.substr(r)))].append(r)
-
-        for key in regs:
-            view.add_regions('cc'+key,regs[key],'cc'+key,'', sublime.DRAW_NO_OUTLINE )
+        self.on_modified_async(view)
 
     def on_activated_async(self, view):
         self.on_load_async(view)
