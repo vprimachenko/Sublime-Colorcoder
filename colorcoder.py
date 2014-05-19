@@ -42,34 +42,24 @@ class crc8:
             runningCRC = self.crcTable[runningCRC ^ c]
         return runningCRC
 
+def plugin_loaded():
+    sublime.load_settings("Preferences.sublime-settings").add_on_change('color_scheme',maybefixscheme)
+    pp = sublime.packages_path()
+    if not os.path.exists(pp+"/Colorcoder"):
+        os.makedirs(pp+"/Colorcoder")
+
+    firstrunfile = pp+"/Colorcoder/firstrun"
+    if not os.path.exists(firstrunfile):
+        maybefixscheme()
+        open(firstrunfile, 'a').close()
+
 class colorcoder(sublime_plugin.EventListener):
 
     hasher = crc8();
 
     def __init__(self):
-        sublime.set_timeout(self.read_settings,500)
-
-    def read_settings(self):
-        sublime.load_settings("Preferences.sublime-settings").add_on_change('color_scheme',self.maybefixscheme)
-        pp = sublime.packages_path()
-        if not os.path.exists(pp+"/Colorcoder"):
-            os.makedirs(pp+"/Colorcoder")
-
-        firstrunfile = pp+"/Colorcoder/firstrun"
-        if not os.path.exists(firstrunfile):
-            self.maybefixscheme()
-            open(firstrunfile, 'a').close()
-
-        self.on_modified(sublime.active_window().active_view())
-
-    def maybefixscheme(self):
-        set = sublime.load_settings("colorcoder.sublime-settings")
-        if set.get('auto_apply_on_scheme_change'):
-            if sublime.load_settings("Preferences.sublime-settings").get('color_scheme').find('/Colorcoder/') == -1:
-                modify_color_scheme(set.get('lightness'),set.get('saturation'))
-
-    def on_modified(self, view):
-        sublime.set_timeout(lambda: self.on_modified_async(view), 0)
+        sublime.set_timeout(plugin_loaded,500)
+        sublime.set_timeout(lambda: self.on_modified(sublime.active_window().active_view()),500)
 
     def on_load(self,view):
         if view.file_name():
@@ -90,6 +80,8 @@ class colorcoder(sublime_plugin.EventListener):
 
         self.on_modified(view)
 
+    def on_modified(self, view):
+        sublime.set_timeout(lambda: self.on_modified_async(view), 0)
 
     def on_modified_async(self, view):
         if not view.settings().get('colorcode',True):
@@ -111,6 +103,10 @@ class colorcoder(sublime_plugin.EventListener):
         if cmd=="set_file_type":
             self.on_modified_async(sublime.active_window().active_view())
 
+class colorcoderdisabler(sublime_plugin.ApplicationCommand):
+    def run(self):
+        sublime.active_window().active_view().settings().set('colorcode',False)
+
 class colorshemeemodifier(sublime_plugin.ApplicationCommand):
     def run(self):
         sublime.active_window().show_input_panel("Lightness and Saturation","%s %s" % (sublime.load_settings("colorcoder.sublime-settings").get('lightness'),sublime.load_settings("colorcoder.sublime-settings").get('saturation')),self.panel_callback,None,None)
@@ -123,8 +119,6 @@ class colorshemeemodifier(sublime_plugin.ApplicationCommand):
         sublime.save_settings("colorcoder.sublime-settings")
         sublime.set_timeout(lambda: modify_color_scheme(l,s,True), 0)
 
-        
-
 class colorcoderInspectScope(sublime_plugin.ApplicationCommand):
     def run(self):
         view = sublime.active_window().active_view();
@@ -132,7 +126,11 @@ class colorcoderInspectScope(sublime_plugin.ApplicationCommand):
         print(view.scope_name(sel.a))
         sublime.active_window().run_command("show_panel", {"panel": "console", "toggle": True})
 
-modification_running = False
+def maybefixscheme():
+    set = sublime.load_settings("colorcoder.sublime-settings")
+    if set.get('auto_apply_on_scheme_change'):
+        if sublime.load_settings("Preferences.sublime-settings").get('color_scheme').find('/Colorcoder/') == -1:
+            modify_color_scheme(set.get('lightness'),set.get('saturation'))
 
 def modify_color_scheme(l,s,read_original = False):
     global modification_running
@@ -187,3 +185,5 @@ def modify_color_scheme(l,s,read_original = False):
     sublime.save_settings("Preferences.sublime-settings")
 
     modification_running = False
+
+modification_running = False
