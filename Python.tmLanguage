@@ -60,7 +60,7 @@
 		</dict>
 		<dict>
 			<key>match</key>
-			<string>\b(elif|else|except|finally|for|if|try|while|with|break|continue|pass|raise|return|yield|as|assert|del|exec|print|and|in|is|not|or|global|nonlocal|def|class|import|self|lambda|True|False|None)\b</string>
+			<string>\b(elif|else|except|finally|for|if|try|while|with|break|continue|pass|raise|return|yield|as|assert|del|exec|print|and|in|is|not|or|global|nonlocal|def|class|import|from|self|lambda|True|False|None)\b</string>
 			<key>name</key>
 			<string>keywords.python</string>
 		</dict>
