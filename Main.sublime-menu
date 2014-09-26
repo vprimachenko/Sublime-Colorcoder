@@ -1,27 +1,24 @@
-[{	"caption": "Tools",
-	"id": "tools",
+[{	"id": "view",
 	"children":
-	[{	"caption": "Packages",
-		"id": "packages",
+	[{	"id": "syntax"
+	},{
+		"command": "colorcodertoggler"
+	}]
+},{	"id": "tools",
+	"children":
+	[{	"id": "packages",
 		"children":
 		[{	"caption": "Colorcoder",
 			"id": "Colorcoder-com",
 			"children":
 			[{	"caption": "Tweak Colorcode on current color scheme",
 				"command": "colorshemeemodifier"
-			},{
-				"caption": "Dont Colorcode this view",
-				"command": "colorcoderdisabler"
 			}]
 		}]
 	}]
-},{	"caption": "Preferences",
-	"mnemonic": "n",
-	"id": "preferences",
+},{	"id": "preferences",
 	"children":
-	[{	"caption": "Package Settings",
-		"mnemonic": "P",
-		"id": "package-settings",
+	[{	"id": "package-settings",
 		"children":
 		[{	"id": "Colorcoder-set",
 			"caption": "Colorcoder",

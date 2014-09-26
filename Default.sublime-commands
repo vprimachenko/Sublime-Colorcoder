@@ -1,6 +1,6 @@
 [{	"caption": "Tweak Colorcode to current color scheme",
 	"command": "colorshemeemodifier"
 },{
-	"caption": "Dont Colorcode this view",
-	"command": "colorcoderdisabler"
+	"caption": "Toggle Colorcode on this view",
+	"command": "colorcodertoggler"
 }]
