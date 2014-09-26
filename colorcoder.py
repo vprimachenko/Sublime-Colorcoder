@@ -1,4 +1,4 @@
-import sublime, sublime_plugin, colorsys, plistlib, re, os, os.path
+import sublime, sublime_plugin, colorsys, plistlib, re, os, time, os.path
 
 class crc8:
     def __init__(self):
@@ -42,65 +42,104 @@ class crc8:
             runningCRC = self.crcTable[runningCRC ^ c]
         return runningCRC
 
-def plugin_loaded():
-    sublime.load_settings("Preferences.sublime-settings").add_on_change('color_scheme',maybefixscheme)
-    pp = sublime.packages_path()
-    if not os.path.exists(pp+"/Colorcoder"):
-        os.makedirs(pp+"/Colorcoder")
+hasher = crc8()
+scopes = []
 
-    firstrunfile = pp+"/Colorcoder/firstrun"
-    if not os.path.exists(firstrunfile):
-        maybefixscheme()
-        open(firstrunfile, 'a').close()
+class colorcoder(sublime_plugin.TextCommand,sublime_plugin.EventListener):
 
-class colorcoder(sublime_plugin.EventListener):
+    def on_new(self,view):
+        view.settings().set('colorcode',True)
 
-    hasher = crc8();
+    def on_activated(self, view):
+        self.on_load(view)
 
-    def on_load_async(self,view):
+    def on_load(self,view):
+        view.settings().set('colorcode',True)
+        set = sublime.load_settings("colorcoder.sublime-settings")
         if view.file_name():
             filename = os.path.split(view.file_name())[1]
             dotp = filename.rfind('.')
             ext = '' if dotp == -1 else filename[dotp+1:]
-            set = sublime.load_settings("colorcoder.sublime-settings")
             if (set.has('enabled_for') and ext not in set.get('enabled_for')) or ext in set.get('disabled_for',[]):
                 view.settings().set('colorcode',False)
                 return
-        else:
-            pass
+
+        if view.size() > set.get('max_size',10000) and not view.settings().get('forcecolorcode',False):
+            sublime.status_message("File is too big, disabling colorcoding as it might hurt perfromance")
+            view.settings().set('colorcode',False)
+            return
 
         vcc = view.settings().get('color_scheme')
         if vcc and "Widget" in vcc: 
             view.settings().set('colorcode',False)
             return
 
+        vcc = view.settings().get('syntax')
+        if vcc and ".build-language" in vcc:
+            view.settings().set('colorcode',False)
+            return
+
         self.on_modified_async(view)
 
-    def on_activated_async(self, view):
-        self.on_load_async(view)
+    def on_post_save(self,view):
+        self.on_load(view)
 
     def on_modified_async(self, view):
-        if not view.settings().get('colorcode',True):
-            return
+        view.run_command("colorcoder")
+
+    @staticmethod
+    def update_scopes():
+        global scopes
+        scopes = sublime.load_settings("colorcoder.sublime-settings").get('scopes')
+
+    def on_post_text_command(self, view, cmd, args):
+        if cmd=="set_file_type":
+            sublime.active_window().active_view().run_command("colorcoder")
+
+    def __init__(self, view = None):
+        self.view = view
+
+    def run(self, edit):
+        global hasher, scopes
 
         regs = {}
         for i in map(hex,range(256)):
             regs[i] = []
 
-        for sel in sublime.load_settings("colorcoder.sublime-settings").get('scopes'):
-            for r in view.find_by_selector(sel):
-                regs[hex(self.hasher.crc(view.substr(r)))].append(r)
+        for sel in scopes:
+            for r in self.view.find_by_selector(sel):
+                regs[hex(hasher.crc(self.view.substr(r)))].append(r)
 
         for key in regs:
-            view.add_regions('cc'+key,regs[key],'cc'+key,'', sublime.DRAW_NO_OUTLINE )
+            self.view.add_regions('cc'+key,regs[key],'cc'+key,'', sublime.DRAW_NO_OUTLINE )
 
-    def post_text_command(self, win, cmd, args):
-        if cmd=="set_file_type":
-            self.on_modified_async(sublime.active_window().active_view())
+        del regs
 
-class colorcoderdisabler(sublime_plugin.ApplicationCommand):
+class colorcodertoggler(sublime_plugin.ApplicationCommand):
     def run(self):
-        sublime.active_window().active_view().settings().set('colorcode',False)
+        view = sublime.active_window().active_view()
+        cc = view.settings().get('colorcode',False)
+        view.settings().set('colorcode',not cc)
+        view.settings().set('forcecolorcode',False)
+
+        if cc:
+            for i in map(hex,range(256)):
+                view.erase_regions('cc'+i)
+        else:
+            if view.size() > set.get('max_size',10000):
+                view.settings().set('forcecolorcode',True)
+            view.run_command("colorcoder")
+
+    def is_checked(self):
+        return sublime.active_window().active_view().settings().get('colorcode',False)
+
+    def description(self):
+        if sublime.active_window().active_view().size() > sublime.load_settings("colorcoder.sublime-settings").get('max_size',10000):
+            return "Colorcoding may hurt performance, File is large"
+        else:
+            return "Colorcode this view"
+
+modification_running = False
 
 class colorshemeemodifier(sublime_plugin.ApplicationCommand):
     def run(self):
@@ -111,7 +150,70 @@ class colorshemeemodifier(sublime_plugin.ApplicationCommand):
         sublime.load_settings("colorcoder.sublime-settings").set('lightness',l)
         sublime.load_settings("colorcoder.sublime-settings").set('saturation',s)
         sublime.save_settings("colorcoder.sublime-settings")
-        modify_color_scheme(l,s,True)
+        colorshemeemodifier.modify_color_scheme(l,s,True)
+
+    @staticmethod
+    def maybefixscheme():
+        set = sublime.load_settings("colorcoder.sublime-settings")
+        if set.get('auto_apply_on_scheme_change'):
+            if sublime.load_settings("Preferences.sublime-settings").get('color_scheme').find('/Colorcoder/') == -1:
+                colorshemeemodifier.modify_color_scheme(set.get('lightness'),set.get('saturation'))
+
+    @staticmethod
+    def modify_color_scheme(l,s,read_original = False):
+        read_original = read_original and sublime.load_settings("Preferences.sublime-settings").has("original_color_scheme")
+        if read_original and sublime.load_settings("Preferences.sublime-settings").get('color_scheme').find('/Colorcoder/') == -1:
+            read_original = False
+        global modification_running
+        if modification_running:
+            return
+        modification_running = True
+        name = sublime.load_settings("Preferences.sublime-settings").get("original_color_scheme") if read_original else sublime.active_window().active_view().settings().get('color_scheme')
+        try:
+            cs = plistlib.readPlistFromBytes(sublime.load_binary_resource(name))
+
+            tokenclr = "#000000"
+            for rule in cs["settings"]:
+                if "scope" not in rule and "name" not in rule:
+                    bgc = rule["settings"]["background"]
+                    r = int(bgc[1:3],16)
+                    g = int(bgc[3:5],16)
+                    b = int(bgc[5:7],16)
+                    if b>0:
+                        b = b-1
+                    elif g>0:
+                        g = g-1
+                    elif r>0:
+                        r = r-1
+                    else:
+                        rule["settings"]["background"] = "#000001"
+                    tokenclr =  "#%02x%02x%02x" % (r,g,b)
+                    break
+
+            cs["name"] = cs["name"] + " (Colorcoded)"
+
+            for x in range(0,256):
+                cs["settings"].append(dict(
+                    scope="cc0x%x" % x,
+                    settings=dict(
+                        foreground="#"+''.join(map(lambda c: "%02x" % int(256*c),colorsys.hls_to_rgb(x/256., l, s))),
+                        background=tokenclr
+                    )
+                ))
+
+            newname = "/Colorcoder/%s (Colorcoded).tmTheme" % re.search("/([^/]+).tmTheme$", name).group(1)
+
+            plistlib.writePlist(cs,"%s%s" % (sublime.packages_path(),newname))
+
+            sublime.load_settings("Preferences.sublime-settings").set("original_color_scheme", name)
+            sublime.load_settings("Preferences.sublime-settings").set("color_scheme","Packages%s" % newname)
+            sublime.save_settings("Preferences.sublime-settings")
+        except Exception as e:
+            sublime.error_message("Colorcoder was not able to parse the colorscheme\nCheck the console for the actual error message.")
+            sublime.active_window().run_command("show_panel", {"panel": "console", "toggle": True})
+            print(e)
+        finally:
+            modification_running = False
 
 class colorcoderInspectScope(sublime_plugin.ApplicationCommand):
     def run(self):
@@ -120,49 +222,21 @@ class colorcoderInspectScope(sublime_plugin.ApplicationCommand):
         print(view.scope_name(sel.a))
         sublime.active_window().run_command("show_panel", {"panel": "console", "toggle": True})
 
-def maybefixscheme():
-    set = sublime.load_settings("colorcoder.sublime-settings")
-    if set.get('auto_apply_on_scheme_change'):
-        if sublime.load_settings("Preferences.sublime-settings").get('color_scheme').find('/Colorcoder/') == -1:
-            modify_color_scheme(set.get('lightness'),set.get('saturation'))
+def plugin_loaded():
+    sublime.load_settings("Preferences.sublime-settings").add_on_change('color_scheme',colorshemeemodifier.maybefixscheme)
+    sublime.load_settings("colorcoder.sublime-settings").add_on_change('scopes',colorcoder.update_scopes)
+    colorcoder.update_scopes()
+    pp = sublime.packages_path()
+    if not os.path.exists(pp+"/Colorcoder"):
+        os.makedirs(pp+"/Colorcoder")
 
-def modify_color_scheme(l,s,read_original = False):
-    name = sublime.load_settings("Preferences.sublime-settings").get("original_color_scheme") if read_original else sublime.active_window().active_view().settings().get('color_scheme')
-    cs = plistlib.readPlistFromBytes(bytes(sublime.load_resource(name),'UTF-8'))
-    tokenclr = "#000000"
+    firstrunfile = pp+"/Colorcoder/firstrun"
+    if not os.path.exists(firstrunfile):
+        colorshemeemodifier.maybefixscheme()
+        open(firstrunfile, 'a').close()
 
-    for rule in cs["settings"]:
-        if "scope" not in rule and "name" not in rule:
-            bgc = rule["settings"]["background"]
-            r = int(bgc[1:3],16)
-            g = int(bgc[3:5],16)
-            b = int(bgc[5:7],16)
-            if b>0:
-                b = b-1
-            elif g>0:
-                g = g-1
-            elif r>0:
-                r = r-1
-            else:
-                rule["settings"]["background"] = "#000001"
-            tokenclr =  "#%02x%02x%02x" % (r,g,b)
-            break
+    for wnd in sublime.windows():
+        for view in wnd.views():
+            view.settings().set('colorcode',True)
+            view.run_command("colorcoder")
 
-    cs["name"] = cs["name"] + " (Colorcode)"
-
-    for x in range(0,256):
-        cs["settings"].append(dict(
-            scope="cc0x%x" % x,
-            settings=dict(
-                foreground="#"+''.join(map(lambda c: "%02x" % int(256*c),colorsys.hls_to_rgb(x/256, l, s))),
-                background=tokenclr
-            )
-        ))
-
-    newname = "/Colorcoder/%s (Colorcode).tmTheme" % re.search("/([^/]+).tmTheme$", name).group(1)
-
-    plistlib.writePlist(cs,"%s%s" % (sublime.packages_path(),newname))
-
-    sublime.load_settings("Preferences.sublime-settings").set("original_color_scheme", name)
-    sublime.load_settings("Preferences.sublime-settings").set("color_scheme","Packages%s" % newname)
-    sublime.save_settings("Preferences.sublime-settings")
