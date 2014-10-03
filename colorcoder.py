@@ -122,7 +122,7 @@ class colorcodertoggler(sublime_plugin.ApplicationCommand):
             for i in map(hex,range(256)):
                 view.erase_regions('cc'+i)
         else:
-            if view.size() > set.get('max_size',10000):
+            if view.size() > sublime.load_settings("colorcoder.sublime-settings").get('max_size',10000):
                 view.settings().set('forcecolorcode',True)
             view.run_command("colorcoder")
 
