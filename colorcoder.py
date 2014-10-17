@@ -164,6 +164,9 @@ class colorshemeemodifier(sublime_plugin.ApplicationCommand):
         read_original = read_original and sublime.load_settings("Preferences.sublime-settings").has("original_color_scheme")
         if read_original and sublime.load_settings("Preferences.sublime-settings").get('color_scheme').find('/Colorcoder/') == -1:
             read_original = False
+        if sublime.load_settings("Preferences.sublime-settings").get('original_color_scheme').find('/Colorcoder/') != -1:
+            print("original theme already colorcoded, abort")
+            return
         global modification_running
         if modification_running:
             return
