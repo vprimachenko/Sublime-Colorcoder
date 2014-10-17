@@ -166,7 +166,8 @@ class colorshemeemodifier(sublime_plugin.ApplicationCommand):
         modification_running = True
         name = sublime.load_settings("Preferences.sublime-settings").get("original_color_scheme") if read_original else sublime.active_window().active_view().settings().get('color_scheme')
         try:
-            cs = plistlib.readPlist(re.sub(r'^Packages',sublime.packages_path(),name))
+            pp = re.sub(r'\\','/',sublime.packages_path())
+            cs = plistlib.readPlist(re.sub(r'^Packages',pp,name))
 
             tokenclr = "#000000"
             for rule in cs["settings"]:
