@@ -1,6 +1,7 @@
 #Colorcoder
 This plugin for Sublime Text will highlight every variable in its own, consistent color — feature known as semantic highlighting, variable-name highlighting, contextual highlighting — you name it.
 ![code from rosettacode.org used under GNU FDL 1.2](https://dl.dropboxusercontent.com/u/14672987/site/colorcoder/colorcoder.png)
+
 Notice how all instances of `m_nValue` share the same color
 
 ##Motivation
