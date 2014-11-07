@@ -6,5 +6,6 @@
 	           "variable.other"],
 	"auto_apply_on_scheme_change": true,
 	"lightness":0.5,
-	"saturation":0.5
+	"saturation":0.5,
+	"max_size": 100000
 }

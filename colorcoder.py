@@ -64,8 +64,9 @@ class colorcoder(sublime_plugin.TextCommand,sublime_plugin.EventListener):
                 view.settings().set('colorcode',False)
                 return
 
-        if view.size() > set.get('max_size',10000) and not view.settings().get('forcecolorcode',False):
+        if view.size() > set.get('max_size') and not view.settings().get('forcecolorcode',False):
             sublime.status_message("File is too big, disabling colorcoding as it might hurt perfromance")
+            colorcoder.remove_regions(view)
             view.settings().set('colorcode',False)
             return
 
@@ -85,7 +86,8 @@ class colorcoder(sublime_plugin.TextCommand,sublime_plugin.EventListener):
         self.on_load(view)
 
     def on_modified(self, view):
-        sublime.set_timeout(lambda: view.run_command("colorcoder"), 0)
+        if view.settings().get('colorcode',False) or view.settings().get('forcecolorcode',False):
+            sublime.set_timeout(lambda: view.run_command("colorcoder"), 0)
 
     @staticmethod
     def update_scopes():
@@ -111,6 +113,12 @@ class colorcoder(sublime_plugin.TextCommand,sublime_plugin.EventListener):
 
         del regs
 
+    @staticmethod
+    def remove_regions(view):
+        for i in map(hex,range(256)):
+            view.erase_regions('cc'+i)
+
+
 class colorcodertoggler(sublime_plugin.ApplicationCommand):
     def run(self):
         view = sublime.active_window().active_view()
@@ -119,18 +127,18 @@ class colorcodertoggler(sublime_plugin.ApplicationCommand):
         view.settings().set('forcecolorcode',False)
 
         if cc:
-            for i in map(hex,range(256)):
-                view.erase_regions('cc'+i)
+            colorcoder.remove_regions(view)
         else:
-            if view.size() > sublime.load_settings("colorcoder.sublime-settings").get('max_size',10000):
+            if view.size() > sublime.load_settings("colorcoder.sublime-settings").get('max_size'):
                 view.settings().set('forcecolorcode',True)
             view.run_command("colorcoder")
 
     def is_checked(self):
-        return sublime.active_window().active_view().settings().get('colorcode',False)
+        viewset = sublime.active_window().active_view().settings()
+        return viewset.get('colorcode',False) or viewset.get('forcecolorcode',False)
 
     def description(self):
-        if sublime.active_window().active_view().size() > sublime.load_settings("colorcoder.sublime-settings").get('max_size',10000):
+        if sublime.active_window().active_view().size() > sublime.load_settings("colorcoder.sublime-settings").get('max_size'):
             return "Colorcoding may hurt performance, File is large"
         else:
             return "Colorcode this view"
