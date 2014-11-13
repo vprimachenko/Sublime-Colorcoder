@@ -7,5 +7,6 @@
 	"auto_apply_on_scheme_change": true,
 	"lightness":0.5,
 	"saturation":0.5,
-	"max_size": 100000
+	"max_size": 100000,
+	"use_fast_highlighting_but_undo_typing_letterwise": true
 }
