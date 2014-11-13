@@ -16,6 +16,7 @@ Download the [zip-ball](https://github.com/vprimachenko/Sublime-Colorcoder/archi
 
 To properly work Colorcoder need an appropriately modified color scheme. On the first run plugin will try its best to automatically modify your current scheme. :grey_exclamation: the plugin will not actually modify the scheme but create a modified copy in its own directory and apply it. 
 You can use `Tools`▶`Packages`▶`Colorcoder`▶` Tweak Colorcode on current color scheme` (or <kbd>CTRL</kbd><kbd>SHIFT</kbd><kbd>P</kbd> it) to modify the colors a bit (you can change the lightness and saturation).
+Colorcoder also needs an "good" language definition, which it does not activate automatically but leave you the choise to do so, read below for more.
 
 ##Supported Languages
 As few language definitions provided by Sublime are insufficient for optimal Colorcoder results i bundle tailored definitions. So far its
@@ -57,9 +58,12 @@ it should be somewhere within first 50–100 lines
 		</dict>
 
 or modify the bundled `.tmLanguage` files, you probably would only need to replace the keywords
+
 ##Options
-Colorcoder allows you to specify white- and blacklist for file-types to highlight: the settings are `enabled_for` and `disabled_for`. If `enabled_for` is present in the config only those file-types will be highlighted, `disabled_for` wont be highlighted even if present in whitelist. 
 You can turn the highlighting off per view via `View`▶`Colorcode this view`.
 Colorcoder also might slow down the editor when highlighting huge files, so it will turn itself off once the file has exceeded the `max_size` (the check happens when you save the file or reactivate the view). You can force it to highlight the file nevertheless via said menu item (which will read `Colorcoding may hurt performance, File is large` now)
+Default (faster) highlighting method makes the undo work letterwise, you can change this by setting `use_fast_highlighting_but_undo_typing_letterwise` to false. Colorcoder will then use alternative engine, which does not interfer with undo, but work somewhat slower on large files. You might want to tune `max_size` lower then.
+Finally Colorcoder allows you to specify white- and blacklist for file-types to highlight: the settings are `enabled_for` and `disabled_for`. If `enabled_for` is present in the config only those file-types will be highlighted, `disabled_for` wont be highlighted even if present in whitelist.
+
 ##Contact
 You can reach me via email: [vprimachenko@ya.ru](mailto:vprimachenko@ya.ru), twitter: [@vprimachenko](https://twitter.com/vprimachenko) or visit the official irc channel [freenode.net#colorcoder](irc://irc.freenode.net/colorcoder) ([webchat](http://webchat.freenode.net/?channels=colorcoder)). If Colorcoder was usefull to you i greatly appreciate a donation via Bitcoin [1DzZ1thGTHubRzoxEeDCJnJZwgFpna6jQk](bitcoin:1DzZ1thGTHubRzoxEeDCJnJZwgFpna6jQk).
