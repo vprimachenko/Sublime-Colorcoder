@@ -1,11 +1,17 @@
 {
+	//these scopes are highlighted by colorcoder, feel free to ADD new to the list
 	"scopes": ["colorize",
 	           "entity.name",
 	           "support.function",
 	           "meta.function-call",
 	           "variable.other"],
+	//disable when using plug-ins which swap or modify the schemes themselves
 	"auto_apply_on_scheme_change": true,
 	"lightness":0.5,
 	"saturation":0.5,
-	"max_size": 100000
+	//this is the threshold of file size where colorcoder will turn itself off
+	"max_size": 100000,
+	//default highlighting engine makes undo work letter-by-letter, set this to false to have
+	//word-by-word undo, but slower highlighting
+	"use_fast_highlighting_but_undo_typing_letterwise": true
 }
