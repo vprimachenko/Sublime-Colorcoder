@@ -14,12 +14,12 @@ it is important to note i use a `crc8` hash of the variable name to give similar
 ##Installation
 Download the [zip-ball](https://github.com/vprimachenko/Sublime-Colorcoder/archive/master.zip) and unpack to `sublime\data\packages` or via [packageControl](https://sublime.wbond.net/). Please make sure to name the resulting folder `Colorcoder` not ~~`Sublime-Colorcoder`~~.
 
-To properly work Colorcoder need an appropriately modified color scheme. On the first run plugin will try its best to automatically modify your current scheme. :grey_exclamation: the plugin will not actually modify the scheme but create a modified copy in its own directory and apply it. 
+To properly work Colorcoder needs an appropriately modified color scheme. On the first run plugin will try its best to automatically modify your current scheme. :grey_exclamation: the plugin will not actually modify the scheme but create a modified copy in its own directory and apply it. 
 You can use `Tools`▶`Packages`▶`Colorcoder`▶` Tweak Colorcode on current color scheme` (or <kbd>CTRL</kbd><kbd>SHIFT</kbd><kbd>P</kbd> it) to modify the colors a bit (you can change the lightness and saturation).
-Colorcoder also needs an "good" language definition, which it does not activate automatically but leave you the choise to do so, read below for more.
+Colorcoder also needs a "good" language definition, which it does not activate automatically but leaves you the choice to do so, read below for more.
 
 ##Supported Languages
-As few language definitions provided by Sublime are insufficient for optimal Colorcoder results i bundle tailored definitions. So far its
+As the few language definitions provided by Sublime are insufficient for optimal Colorcoder results I bundle tailored definitions. So far it's
 
  - `C++`
  - `Python`
@@ -39,12 +39,12 @@ You can set them up as default via `language menu`▶`Open all with current exte
 Sometimes things we are interested in don't have distinct scope e.g. the variables in `Javascript` are only `source.js`. You would need to modify the `.tmLanguage`.
 
 - First you need to obtain it - it is inside the same names `.sublime-package` file, which is a zip-archive
-- now locate first instance of
+- now locate the first instance of
 
 		<key>patterns</key>
 		<array>
 
-it should be somewhere within first 50–100 lines
+it should be somewhere within the first 50–100 lines
 - use code folding to find where according `</array>` is
 - place following right before it
 
@@ -63,7 +63,7 @@ or modify the bundled `.tmLanguage` files, you probably would only need to repla
 You can turn the highlighting off per view via `View`▶`Colorcode this view`.
 Colorcoder also might slow down the editor when highlighting huge files, so it will turn itself off once the file has exceeded the `max_size` (the check happens when you save the file or reactivate the view). You can force it to highlight the file nevertheless via said menu item (which will read `Colorcoding may hurt performance, File is large` now)
 Default (faster) highlighting method makes the undo work letterwise, you can change this by setting `use_fast_highlighting_but_undo_typing_letterwise` to false. Colorcoder will then use alternative engine, which does not interfer with undo, but work somewhat slower on large files. You might want to tune `max_size` lower then.
-Colorcoder allows you to specify white- and blacklist for file-types to highlight: the settings are `enabled_for` and `disabled_for`. If `enabled_for` is present in the config only those file-types will be highlighted, `disabled_for` wont be highlighted even if present in whitelist.
+Colorcoder allows you to specify white- and blacklist for file-types to highlight: the settings are `enabled_for` and `disabled_for`. If `enabled_for` is present in the config only those file-types will be highlighted, `disabled_for` won't be highlighted even if present in whitelist.
 Finally :exclamation: if you use some plugins which change the color scheme based on time, or filename, or modify the schemes you better turn the `auto_apply_on_scheme_change` off, or the plugin conflict may result in an endless loop which will lock the editor. You can always change the settings even when sublime is not running.
 
 ##Contact
